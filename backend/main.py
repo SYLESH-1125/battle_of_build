@@ -1,5 +1,6 @@
 """FastAPI entrypoint for the Memory Vault gateway."""
 import os
+import asyncio
 import logging
 from typing import Optional
 
@@ -20,6 +21,7 @@ from config import apply_privacy_filter, REDIS_URL
 import re
 from dependencies import verify_api_key
 from routes.resolve_pr import router as resolve_pr_router
+from worker import run_worker
 
 # Enhanced logging with colors for visibility
 class ColoredFormatter(logging.Formatter):
@@ -81,7 +83,6 @@ except Exception:
 
 @app.on_event("startup")
 async def startup_event() -> None:
-    # Initialize Redis
     logger.info("🚀 Initializing Memory Vault gateway...")
     logger.info(f"📡 Redis URL: {REDIS_URL}")
     app.state.redis = redis.from_url(
@@ -90,13 +91,19 @@ async def startup_event() -> None:
         socket_connect_timeout=10,
         socket_timeout=10,
     )
-    logger.info("✅ Startup complete: Ready to ingest clinical records")
-    # Note: DB pool initialization skipped - Module 4 now uses Supabase client directly
+    app.state.worker_task = asyncio.create_task(run_worker())
+    logger.info("✅ Startup complete: API + background worker running")
 
 
 @app.on_event("shutdown")
 async def shutdown_event() -> None:
-    # Close Redis
+    worker_task = getattr(app.state, "worker_task", None)
+    if worker_task:
+        worker_task.cancel()
+        try:
+            await worker_task
+        except asyncio.CancelledError:
+            pass
     redis_client = getattr(app.state, "redis", None)
     if redis_client is not None:
         await redis_client.aclose()
