@@ -1,13 +1,16 @@
 name: Deploy Backend to Render
 
+# Render auto-deploys on push via native GitHub integration (autoDeploy: yes in render.yaml).
+# This workflow is kept for manual emergency re-deploys only.
+# It is NOT triggered on push to avoid GitHub Actions billing consumption.
+
 on:
-  push:
-    branches: [main]
-    paths:
-      - "backend/**"
-      - "render.yaml"
-      - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual re-deploy"
+        required: false
+        default: "manual trigger"
 
 jobs:
   deploy:
@@ -15,12 +18,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Trigger Render deploy hook
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" | \
-            grep -qE '^2' && echo "Deploy triggered successfully" || \
-            (echo "Deploy hook failed" && exit 1)
+          echo "Triggering Render deploy: ${{ github.event.inputs.reason }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+          echo "Response: $STATUS"
+          echo "$STATUS" | grep -qE '^2' && echo "✅ Deploy triggered" || \
+            (echo "❌ Deploy hook failed with status $STATUS" && exit 1)

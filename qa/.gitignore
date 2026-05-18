@@ -1,0 +1,4 @@
+node_modules/
+screenshots/
+qa/screenshots/
+package-lock.json

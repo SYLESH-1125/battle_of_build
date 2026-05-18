@@ -1,12 +1,16 @@
 name: Deploy Frontend to Vercel
 
+# Vercel auto-deploys on push via native GitHub integration.
+# This workflow is kept for manual emergency re-deploys only.
+# It is NOT triggered on push to avoid GitHub Actions billing consumption.
+
 on:
-  push:
-    branches: [main]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/deploy-frontend.yml"
   workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual re-deploy"
+        required: false
+        default: "manual trigger"
 
 jobs:
   deploy:
