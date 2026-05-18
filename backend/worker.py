@@ -88,7 +88,14 @@ def _get_patient_context(patient_id: str) -> str:
         )
         context_parts = []
         for row in (result.data or []):
-            fhir = row.get("fhir_json") or {}
+            raw_fhir = row.get("fhir_json") or {}
+            # Supabase may return fhir_json as a string if double-encoded on insert
+            if isinstance(raw_fhir, str):
+                try:
+                    raw_fhir = json.loads(raw_fhir)
+                except Exception:
+                    raw_fhir = {}
+            fhir = raw_fhir if isinstance(raw_fhir, dict) else {}
             for entry in fhir.get("entry", []):
                 resource = entry.get("resource", {})
                 rtype = resource.get("resourceType", "")
