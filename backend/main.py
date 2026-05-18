@@ -85,12 +85,15 @@ except Exception:
 async def startup_event() -> None:
     logger.info("🚀 Initializing Memory Vault gateway...")
     logger.info(f"📡 Redis URL: {REDIS_URL}")
-    app.state.redis = redis.from_url(
-        REDIS_URL,
+    _redis_kwargs: dict = dict(
         decode_responses=True,
         socket_connect_timeout=10,
         socket_timeout=10,
     )
+    if REDIS_URL.startswith("rediss://"):
+        import ssl as _ssl
+        _redis_kwargs["ssl_cert_reqs"] = _ssl.CERT_NONE
+    app.state.redis = redis.from_url(REDIS_URL, **_redis_kwargs)
     app.state.worker_task = asyncio.create_task(run_worker())
     logger.info("✅ Startup complete: API + background worker running")
 

@@ -30,27 +30,61 @@ FHIR_PROMPT = (
 )
 
 
+def _extract_json(raw: str) -> str:
+    """Strip qwen3 <think> blocks and markdown fences, return bare JSON string."""
+    content = raw.strip()
+    # qwen3 wraps chain-of-thought in <think>...</think> before the actual answer
+    if "<think>" in content and "</think>" in content:
+        content = content.split("</think>", 1)[1].strip()
+    elif content.startswith("<think>"):
+        return ""  # only reasoning returned, no answer
+    # Strip markdown code fences
+    if content.startswith("```"):
+        lines = content.splitlines()
+        start = 1
+        if len(lines) > start and lines[start].strip() in ("json", ""):
+            start += 1
+        end = len(lines)
+        while end > start and lines[end - 1].strip() == "```":
+            end -= 1
+        content = "\n".join(lines[start:end]).strip()
+    return content
+
+
 def call_groq(raw_text: str, patient_id: str) -> dict:
+    fallback = {
+        "resourceType": "Bundle",
+        "entry": [{"resource": {"resourceType": "Patient", "id": patient_id,
+                                "note": [{"text": raw_text[:200] if raw_text else "No clinical text provided"}]}}],
+    }
     if not groq or not raw_text.strip():
-        return {
-            "resourceType": "Bundle",
-            "entry": [{"resource": {"resourceType": "Patient", "id": patient_id,
-                                    "note": [{"text": "No clinical text provided"}]}}],
-        }
+        return fallback
     try:
         resp = groq.chat.completions.create(
             model=LLM_CLOUD_MODEL,
             messages=[{"role": "user", "content": FHIR_PROMPT.format(text=raw_text)}],
             timeout=30,
         )
-        content = resp.choices[0].message.content.strip()
-        if content.startswith("```"):
-            lines = content.splitlines()
-            content = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+        content = _extract_json(resp.choices[0].message.content or "")
+        if not content:
+            raise ValueError("Empty response after stripping thinking tags")
         return json.loads(content)
     except Exception as e:
         logger.warning(f"Groq/parse error for {patient_id}: {e}")
-        return {"resourceType": "Bundle", "entry": [{"resource": {"resourceType": "Patient", "id": patient_id}}]}
+        return fallback
+
+
+def _make_redis_client():
+    """Create an async Redis client. Adds ssl_cert_reqs=None for Upstash TLS URLs."""
+    kwargs = dict(
+        decode_responses=True,
+        socket_connect_timeout=10,
+        socket_timeout=10,
+    )
+    if REDIS_URL.startswith("rediss://"):
+        import ssl
+        kwargs["ssl_cert_reqs"] = ssl.CERT_NONE
+    return aioredis.from_url(REDIS_URL, **kwargs)
 
 
 async def _drain_redis(redis_client) -> int:
@@ -84,13 +118,15 @@ async def _drain_redis(redis_client) -> int:
 
 
 async def _poll_staging_vault() -> int:
+    """Process pending + stuck-processing records from staging_vault."""
     if not supabase:
         return 0
     try:
+        # Pick up pending AND old stuck-processing records (< 3 attempts)
         result = (
             supabase.table("staging_vault")
             .select("id, patient_id, raw_payload, attempts")
-            .eq("status", "pending")
+            .in_("status", ["pending", "processing"])
             .lt("attempts", 3)
             .limit(10)
             .execute()
@@ -126,21 +162,18 @@ async def _poll_staging_vault() -> int:
 
 
 async def run_worker():
-    """Entry point — call this as asyncio.create_task(run_worker()) from FastAPI startup."""
+    """Entry point — called as asyncio.create_task(run_worker()) from FastAPI startup."""
     logger.info("🤖 [WORKER] Background worker starting...")
 
     redis_client = None
     use_redis = False
     try:
-        redis_client = aioredis.from_url(
-            REDIS_URL, decode_responses=True,
-            socket_connect_timeout=10, socket_timeout=10,
-        )
+        redis_client = _make_redis_client()
         await redis_client.ping()
         logger.info("✅ [WORKER] Redis connected")
         use_redis = True
     except Exception as e:
-        logger.warning(f"⚠️ [WORKER] Redis unavailable, polling staging_vault: {e}")
+        logger.warning(f"⚠️ [WORKER] Redis unavailable, using staging_vault polling: {e}")
 
     while True:
         try:
@@ -152,7 +185,7 @@ async def run_worker():
                     await asyncio.sleep(POLL_INTERVAL)
             else:
                 count = await _poll_staging_vault()
-                await asyncio.sleep(POLL_INTERVAL if count == 0 else 2)
+                await asyncio.sleep(2 if count > 0 else POLL_INTERVAL)
         except asyncio.CancelledError:
             logger.info("🛑 [WORKER] Shutting down")
             break
