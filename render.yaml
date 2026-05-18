@@ -24,7 +24,7 @@ services:
       - key: LLM_CLOUD_PROVIDER
         value: groq
       - key: LLM_CLOUD_MODEL
-        value: qwen/qwen3-32b
+        value: llama-3.3-70b-versatile
       - key: LLM_CLOUD_TIMEOUT_MS
         value: "10000"
       - key: FRONTEND_URL
