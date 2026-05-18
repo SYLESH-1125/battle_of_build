@@ -1,0 +1,63 @@
+========================================
+  APOLLO MULTISPECIALITY CENTRE
+  ORTHOPAEDICS OPD — CLINICAL NOTE
+  Attending: Dr. Vikram Bose (DL-MCI-2026-ORTHO-007)
+========================================
+
+PATIENT: Silva, Roberto
+DOB: 29 Nov 1978  |  Age: 47 yrs  |  Sex: M
+MRN: SILVA-ROBERTO-ORTHO-2026
+
+DATE: 18 May 2026, 11:00 hrs
+VISIT TYPE: Post-Op Day 3 Follow-up
+
+─────────────────────────────────
+CHIEF COMPLAINT
+─────────────────────────────────
+Post-operative pain following right total knee replacement
+(TKR), performed 15 May 2026. Pain score 7/10.
+Mild swelling. No fever, no wound discharge.
+
+─────────────────────────────────
+ALLERGIES ⚠️  HIGH RISK
+─────────────────────────────────
+1. NSAIDs — GASTRIC BLEED (Peptic ulcer perforation, 2020)
+   *** Ibuprofen caused GI perforation requiring surgery ***
+   *** Naproxen caused same reaction in 2022 ***
+   ALL NSAIDs CONTRAINDICATED
+
+─────────────────────────────────
+PAST MEDICAL HISTORY
+─────────────────────────────────
+• Osteoarthritis bilateral knees (right > left)
+• PUD — H. pylori eradicated 2020, recurrence 2022
+• Hypertension (Losartan 50mg OD)
+• No diabetes, no cardiac disease
+
+─────────────────────────────────
+CURRENT MEDICATIONS (pre-op)
+─────────────────────────────────
+• Losartan 50mg OD (held peri-op, restart today)
+• Omeprazole 20mg OD (gastroprotection — ongoing)
+• Enoxaparin 40mg SC OD (DVT prophylaxis)
+
+─────────────────────────────────
+POST-OP PAIN MANAGEMENT PLAN
+─────────────────────────────────
+Dr. Bose notes: Patient requires strong analgesia for
+physiotherapy compliance. Prescribing the following:
+
+1. Ibuprofen 400mg TDS × 5 days (anti-inflammatory for post-op swelling)
+2. Naproxen 500mg BD PRN (breakthrough pain)
+3. Paracetamol 1g QDS (base analgesia)
+4. Tramadol 50mg TDS (opioid bridge while swelling settles)
+5. Omeprazole 40mg OD (doubled dose)
+
+PHYSIO: Start ROM exercises day 4.
+Outpatient review at 2 weeks.
+
+─────────────────────────────────
+SIGNED: Dr. Vikram Bose
+ID: DL-MCI-2026-ORTHO-007
+Timestamp: 18-May-2026 11:22 hrs
+========================================

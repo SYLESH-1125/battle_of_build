@@ -1,0 +1,83 @@
+========================================
+  DISTRICT MEMORIAL HOSPITAL
+  CLINICAL INTAKE NOTE — EMERGENCY
+  Attending: Dr. Rajesh Nair (DL-MCI-2026-ENT-004)
+========================================
+
+PATIENT: Kapoor, Arun
+DOB: 12 Mar 1967  |  Age: 59 yrs  |  Sex: M
+MRN: KAPOOR-ARUN-ICU-2026
+
+DATE OF ADMISSION: 18 May 2026, 09:15 hrs
+WARD: ICU BED 4  |  PRIORITY: CRITICAL
+
+─────────────────────────────────
+CHIEF COMPLAINT
+─────────────────────────────────
+High-grade fever (39.8°C), productive cough × 4 days,
+progressive shortness of breath, SpO2 85% on room air.
+
+─────────────────────────────────
+HISTORY OF PRESENT ILLNESS
+─────────────────────────────────
+59-year-old male presenting with 4-day history of worsening
+productive cough with rust-coloured sputum, pleuritic chest
+pain (right side), and fever. Denies haemoptysis. Admitted
+from Emergency with SpO2 85% on room air, improving to 93%
+on 4L O2 via nasal cannula. CXR shows right lower lobe
+consolidation consistent with community-acquired pneumonia.
+
+─────────────────────────────────
+PAST MEDICAL HISTORY
+─────────────────────────────────
+1. Type 2 Diabetes Mellitus (HbA1c 8.4%, last checked Feb 2026)
+2. Hypertension (on Amlodipine 5mg OD)
+3. COPD — GOLD Stage II (FEV1/FVC 0.62)
+4. Previous hospitalisation: 2019 — bacterial pneumonia
+
+─────────────────────────────────
+ALLERGIES ⚠️  CRITICAL — VERIFY BEFORE PRESCRIBING
+─────────────────────────────────
+1. PENICILLIN → ANAPHYLAXIS (Grade III, 2014 — ICU admission)
+2. SULFA DRUGS → Stevens-Johnson Syndrome (2018)
+3. Aspirin → GI bleed (grade 2, 2021)
+
+─────────────────────────────────
+CURRENT MEDICATIONS
+─────────────────────────────────
+• Metformin 1000mg BD (HOLD during admission — AKI risk)
+• Amlodipine 5mg OD (continue)
+• Tiotropium inhaler 18mcg OD (continue)
+• Salbutamol inhaler PRN (continue)
+
+─────────────────────────────────
+TREATMENT PLAN — PRESCRIPTIONS
+─────────────────────────────────
+1. Amoxicillin-Clavulanate 875/125mg PO BD × 7 days
+   [Note from Dr. Nair: selected empirically for CAP coverage]
+2. Azithromycin 500mg OD × 5 days (atypical coverage)
+3. Paracetamol 1g TDS PRN for fever/pain
+4. IV Normal Saline 100mL/hr — maintain hydration
+5. Oxygen via nasal cannula to maintain SpO2 ≥ 94%
+
+─────────────────────────────────
+INVESTIGATIONS ORDERED
+─────────────────────────────────
+• CBC, CMP, Procalcitonin, Blood cultures × 2
+• Sputum culture & sensitivity
+• ABG on room air
+• Urine Legionella antigen, Pneumococcal antigen
+• 2D Echo (tachycardia workup)
+
+─────────────────────────────────
+VITALS AT ADMISSION
+─────────────────────────────────
+BP: 148/92 | HR: 108 bpm | RR: 24/min
+Temp: 39.8°C | SpO2: 85% (RA) → 93% (4L O2)
+GCS: 15/15
+
+─────────────────────────────────
+SIGNED: Dr. Rajesh Nair
+ID: DL-MCI-2026-ENT-004
+Timestamp: 18-May-2026 09:42 hrs
+========================================

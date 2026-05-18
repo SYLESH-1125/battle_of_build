@@ -1,0 +1,56 @@
+========================================
+  CITY GENERAL HOSPITAL
+  OUTPATIENT CLINICAL NOTE — INTERNAL MEDICINE
+  Attending: Dr. Sunita Sharma (DL-MCI-2026-MED-012)
+========================================
+
+PATIENT: Mehta, Priya
+DOB: 03 Aug 1989  |  Age: 36 yrs  |  Sex: F
+MRN: MEHTA-PRIYA-OPD-2026
+
+DATE: 18 May 2026, 14:30 hrs
+VISIT TYPE: Acute OPD
+
+─────────────────────────────────
+CHIEF COMPLAINT
+─────────────────────────────────
+Dysuria, frequency, suprapubic pain × 3 days.
+Low-grade fever (38.1°C). No flank pain.
+
+─────────────────────────────────
+ASSESSMENT
+─────────────────────────────────
+Uncomplicated urinary tract infection (cystitis).
+Urine dipstick: Nitrites +, Leukocytes ++, Blood +.
+Mid-stream urine sent for C&S.
+
+─────────────────────────────────
+ALLERGIES ⚠️
+─────────────────────────────────
+1. SULFA (SULFONAMIDES) → Toxic Epidermal Necrolysis (TEN)
+   Documented 2021 — life-threatening. NEVER USE.
+2. Codeine → Respiratory depression (2023)
+
+─────────────────────────────────
+PAST MEDICAL HISTORY
+─────────────────────────────────
+• Recurrent UTIs (3rd episode in 12 months)
+• G1P1 — Last delivery 2023, uncomplicated
+• No known cardiac or renal disease
+
+─────────────────────────────────
+PRESCRIPTIONS
+─────────────────────────────────
+1. Trimethoprim-Sulfamethoxazole (Bactrim DS) 1 tab BD × 5 days
+   [First-line per local UTI guideline — Dr. Sharma note]
+2. Phenazopyridine 200mg TDS × 2 days (symptom relief)
+3. Increase oral fluids to 2.5L/day
+
+─────────────────────────────────
+FOLLOW-UP: 5 days, review C&S result
+─────────────────────────────────
+
+SIGNED: Dr. Sunita Sharma
+ID: DL-MCI-2026-MED-012
+Timestamp: 18-May-2026 14:48 hrs
+========================================
