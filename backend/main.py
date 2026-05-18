@@ -21,6 +21,7 @@ from config import apply_privacy_filter, REDIS_URL
 import re
 from dependencies import verify_api_key
 from routes.resolve_pr import router as resolve_pr_router
+from routes.patient import router as patient_router
 from worker import run_worker
 
 # Enhanced logging with colors for visibility
@@ -66,6 +67,7 @@ app.add_middleware(
 
 # Register routers
 app.include_router(resolve_pr_router)
+app.include_router(patient_router)
 
 
 # Prefer service_role key for fallback inserts if available
