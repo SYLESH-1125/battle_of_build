@@ -87,8 +87,8 @@ async def startup_event() -> None:
     app.state.redis = redis.from_url(
         REDIS_URL,
         decode_responses=True,
-        socket_connect_timeout=1,
-        socket_timeout=1,
+        socket_connect_timeout=10,
+        socket_timeout=10,
     )
     logger.info("✅ Startup complete: Ready to ingest clinical records")
     # Note: DB pool initialization skipped - Module 4 now uses Supabase client directly
