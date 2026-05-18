@@ -1,0 +1,11 @@
+[
+  "billing\\s+code",
+  "internal\\s+psych",
+  "internal\\s+memo",
+  "invoice",
+  "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+  "\\b\\d{9}\\b",
+  "ssn",
+  "social\\s+security",
+  "patient\\s+ssn"
+]

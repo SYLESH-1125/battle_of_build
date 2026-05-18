@@ -1,0 +1,94 @@
+{
+  "test_timestamp": "2026-05-17T03:40:03.665749",
+  "phase_1": {
+    "staging_id": "71ecc83f-0fc4-43e4-8dfb-d82f1f31836f",
+    "fhir_json": {
+      "entry": [
+        {
+          "resource": {
+            "note": [
+              {
+                "text": "Patient presents with high blood pressure. Prescribed Lisinopril 10mg daily."
+              }
+            ],
+            "resourceType": "MedicationRequest",
+            "medicationCodeableConcept": {
+              "coding": [
+                {
+                  "code": "314076",
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "resourceType": "Bundle"
+    },
+    "conflict_flag": false,
+    "vault_id": "df0a62d8-e675-4f68-86ef-211de16de462",
+    "vault_fhir_json_id": "71ecc83f-0fc4-43e4-8dfb-d82f1f31836f"
+  },
+  "phase_2": {
+    "staging_id": "48502b50-08ac-4520-83d8-50b500f48dad",
+    "conflict_flag": true,
+    "ai_warning_msg": "CONFLICT DETECTED: Patient is allergic to ACE Inhibitors (Lisinopril). Prior prescription found in medical history. Medication review required.",
+    "fhir_json": {
+      "entry": [
+        {
+          "resource": {
+            "code": "ACE Inhibitor",
+            "note": [
+              {
+                "text": "Patient reports severe allergic reaction to ACE Inhibitors (Lisinopril) causing angioedema."
+              }
+            ],
+            "resourceType": "AllergyIntolerance"
+          }
+        }
+      ],
+      "resourceType": "Bundle"
+    }
+  },
+  "phase_3": {
+    "audit_id": "7054cc3a-1119-4e20-8775-46ef04bb9913",
+    "audit_entry": {
+      "patient_id": "PT-LIFECYCLE-MASTER-01",
+      "staging_id": "18ecb11d-890a-410d-9a1b-1f69e25e60c6",
+      "admin_id": "qa-automation-principal",
+      "action_type": "approve",
+      "old_value": {
+        "entry": [
+          {
+            "resource": {
+              "note": [
+                {
+                  "text": "Patient presents with high blood pressure. Prescribed Lisinopril 10mg daily."
+                }
+              ],
+              "resourceType": "Patient"
+            }
+          }
+        ],
+        "resourceType": "Bundle"
+      },
+      "new_value": {
+        "entry": [
+          {
+            "resource": {
+              "note": [
+                {
+                  "text": "Patient presents with high blood pressure. Prescribed Lisinopril 10mg daily."
+                }
+              ],
+              "resourceType": "Patient"
+            }
+          }
+        ],
+        "resourceType": "Bundle"
+      },
+      "reason": "Admin override: Patient allergy to Lisinopril documented. Medication review required."
+    },
+    "vault_id_phase2": "0f87c571-df01-498c-b9d3-76021096f4d7"
+  }
+}

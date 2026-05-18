@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+supabase
+python-dotenv
+httpx
+redis[hiredis]>=5.0.0
+openai>=1.0.0
+asyncpg>=0.28.0

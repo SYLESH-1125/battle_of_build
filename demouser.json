@@ -1,0 +1,9 @@
+{
+  "demo_users": [
+    "demodoctor@hospital.com",
+    "demoadmin@hospital.com",
+    "demopatient@hospital.com"
+  ],
+  "demo_pin": "123456",
+  "hidden_password_prefix": "vault-demo-"
+}

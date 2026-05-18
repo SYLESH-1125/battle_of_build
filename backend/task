@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""
+Task runner - dispatches to serve.py for 'serve' command.
+"""
+import sys
+import subprocess
+import os
+
+if __name__ == "__main__":
+    if len(sys.argv) >= 2 and sys.argv[1] == "serve":
+        # Delegate to serve.py in the same directory as this script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        result = subprocess.run([sys.executable, "serve.py"], cwd=script_dir)
+        sys.exit(result.returncode)
+    else:
+        print("Usage: task serve")
+        print("Runs the FastAPI backend with hot reload.")
+        sys.exit(1)

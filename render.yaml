@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: memory-vault-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /docs
+    autoDeploy: true
+    envVars:
+      - key: VAULT_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: PHI_TO_CLOUD_ALLOWED
+        value: "true"
+      - key: LLM_CLOUD_KEY
+        sync: false
+      - key: LLM_CLOUD_PROVIDER
+        value: groq
+      - key: LLM_CLOUD_MODEL
+        value: qwen/qwen3-32b
+      - key: LLM_CLOUD_TIMEOUT_MS
+        value: "10000"
+      - key: FRONTEND_URL
+        sync: false

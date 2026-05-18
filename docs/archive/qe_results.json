@@ -1,0 +1,172 @@
+{
+  "module_1": {
+    "tests": [
+      {
+        "test": "Clean note passes (202 Accepted)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 202",
+        "timestamp": "2026-05-17T00:12:24.742797"
+      },
+      {
+        "test": "SSN blocked (403 Forbidden)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 403, msg: {\"detail\":\"Blocked by privacy filter: SSN detected.\"}",
+        "timestamp": "2026-05-17T00:12:24.768323"
+      },
+      {
+        "test": "Blocked SSN not in staging_vault",
+        "status": "\u2713 PASS",
+        "details": "Row found: False",
+        "timestamp": "2026-05-17T00:12:28.586573"
+      },
+      {
+        "test": "Empty note blocked (403 Forbidden)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 403",
+        "timestamp": "2026-05-17T00:12:28.606165"
+      },
+      {
+        "test": "Clean note in staging_vault",
+        "status": "\u2713 PASS",
+        "details": "Row exists: True",
+        "timestamp": "2026-05-17T00:12:28.649888"
+      }
+    ],
+    "status": "PASS"
+  },
+  "module_2": {
+    "tests": [
+      {
+        "test": "Previous payload in staging_vault",
+        "status": "\u2713 PASS",
+        "details": "Status: processing",
+        "timestamp": "2026-05-17T00:12:28.696750"
+      },
+      {
+        "test": "POST returns 202 (fallback active)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 202",
+        "timestamp": "2026-05-17T00:12:29.801846"
+      },
+      {
+        "test": "Fallback row in staging_vault",
+        "status": "\u2713 PASS",
+        "details": "Row exists: True",
+        "timestamp": "2026-05-17T00:12:29.845892"
+      },
+      {
+        "test": "Fallback reason recorded",
+        "status": "\u2713 PASS",
+        "details": "Reason: redis_unavailable",
+        "timestamp": "2026-05-17T00:12:29.846475"
+      }
+    ],
+    "status": "PASS"
+  },
+  "module_3": {
+    "tests": [
+      {
+        "test": "Conflict scenario posted (202)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 202",
+        "timestamp": "2026-05-17T00:12:31.009666"
+      },
+      {
+        "test": "Row processed",
+        "status": "\u2713 PASS",
+        "details": "Status: processed",
+        "timestamp": "2026-05-17T00:12:56.715402"
+      },
+      {
+        "test": "Conflict flag detected (True)",
+        "status": "\u2713 PASS",
+        "details": "Flag: True",
+        "timestamp": "2026-05-17T00:12:56.716789"
+      },
+      {
+        "test": "FHIR JSON generated",
+        "status": "\u2713 PASS",
+        "details": "Has JSON: True",
+        "timestamp": "2026-05-17T00:12:56.717798"
+      },
+      {
+        "test": "Model used: rule-based",
+        "status": "\u2713 PASS",
+        "details": "Model: rule-based",
+        "timestamp": "2026-05-17T00:12:56.718703"
+      },
+      {
+        "test": "DLQ mechanism works (failed rows present)",
+        "status": "\u2713 PASS",
+        "details": "Failed rows: 6",
+        "timestamp": "2026-05-17T00:12:56.771725"
+      }
+    ],
+    "status": "PASS"
+  },
+  "module_4": {
+    "tests": [
+      {
+        "test": "Final payload posted (202)",
+        "status": "\u2713 PASS",
+        "details": "Response code: 202",
+        "timestamp": "2026-05-17T00:12:58.094791"
+      },
+      {
+        "test": "Final row exists",
+        "status": "\u2713 PASS",
+        "details": "Found: True",
+        "timestamp": "2026-05-17T00:13:13.591904"
+      },
+      {
+        "test": "Status is 'processed'",
+        "status": "\u2713 PASS",
+        "details": "Status: processed",
+        "timestamp": "2026-05-17T00:13:13.593255"
+      },
+      {
+        "test": "FHIR JSON generated",
+        "status": "\u2713 PASS",
+        "details": "Has JSON: True",
+        "timestamp": "2026-05-17T00:13:13.593416"
+      },
+      {
+        "test": "Model recorded",
+        "status": "\u2713 PASS",
+        "details": "Model: rule-based",
+        "timestamp": "2026-05-17T00:13:13.594418"
+      },
+      {
+        "test": "Processed timestamp set",
+        "status": "\u2713 PASS",
+        "details": "Time: 2026-05-16T18:43:10.324175+00:00",
+        "timestamp": "2026-05-17T00:13:13.594928"
+      }
+    ],
+    "status": "PASS",
+    "final_fhir_json": {
+      "entry": [
+        {
+          "resource": {
+            "note": [
+              {
+                "text": "Patient presents with severe joint pain. Prescribed 500mg Naproxen."
+              }
+            ],
+            "resourceType": "Patient"
+          }
+        }
+      ],
+      "resourceType": "Bundle"
+    },
+    "final_row": {
+      "patient_id": "PT-GRAND-E2E-99",
+      "status": "processed",
+      "model": "rule-based",
+      "conflict_flag": false,
+      "ai_warning_msg": "rule-based fallback used; low confidence",
+      "processed_at": "2026-05-16T18:43:10.324175+00:00"
+    }
+  },
+  "timestamp": "2026-05-17T00:12:23.530823"
+}

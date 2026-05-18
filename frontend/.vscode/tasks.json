@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install and Build Next.js",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"\"npm install && npm run build\""
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Install Playwright",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-c",
+				"\"npm install -D @playwright/test && npx playwright install --with-deps\""
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Install Playwright",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install",
+				"-D",
+				"@playwright/test"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Install Playwright",
+			"type": "shell",
+			"command": "npm install -D @playwright/test",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run Next Next.js Server",
+			"type": "shell",
+			"command": "npm run dev",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
