@@ -193,6 +193,7 @@ async def resolve_pr(request: ResolveDecisionRequest) -> ResolveDecisionResponse
             main_vault_entry = {
                 "patient_id": patient_id,
                 "encrypted_fhir_json_id": secret_id,
+                "fhir_json": final_json,
             }
             
             try:

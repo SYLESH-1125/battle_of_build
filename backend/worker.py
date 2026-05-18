@@ -4,6 +4,7 @@ import re
 import json
 import asyncio
 import logging
+from datetime import datetime, timezone
 
 import redis.asyncio as aioredis
 from supabase import create_client
@@ -29,6 +30,21 @@ FHIR_PROMPT = (
     "Return ONLY raw JSON — no markdown, no code fences, no explanation.\n\n"
     "Clinical note:\n{text}"
 )
+
+FHIR_PROMPT_WITH_CONTEXT = (
+    "Convert this clinical note to a minimal valid FHIR R4 Bundle JSON. "
+    "Return ONLY raw JSON — no markdown, no code fences, no explanation.\n\n"
+    "Existing patient context (allergies and conditions already on record):\n{context}\n\n"
+    "Clinical note:\n{text}"
+)
+
+# Cross-reactivity pairs: if patient has allergy to key, flag prescriptions of any value
+CROSS_REACTIVITY_MAP = {
+    "penicillin": ["amoxicillin", "ampicillin", "amoxicillin-clavulanate", "piperacillin", "nafcillin"],
+    "sulfa": ["sulfamethoxazole", "trimethoprim-sulfamethoxazole", "bactrim"],
+    "nsaid": ["ibuprofen", "naproxen", "aspirin", "celecoxib", "diclofenac"],
+    "cephalosporin": ["cephalexin", "cefazolin", "ceftriaxone", "cefdinir"],
+}
 
 
 def _extract_json(raw: str) -> str:
@@ -57,27 +73,89 @@ def _extract_json(raw: str) -> str:
     return content
 
 
-def call_groq(raw_text: str, patient_id: str) -> dict:
+def _get_patient_context(patient_id: str) -> str:
+    """Fetch existing allergy/condition records for a patient from main_vault and staging_vault."""
+    if not supabase:
+        return ""
+    try:
+        result = (
+            supabase.table("main_vault")
+            .select("fhir_json")
+            .eq("patient_id", patient_id)
+            .order("created_at", desc=True)
+            .limit(5)
+            .execute()
+        )
+        context_parts = []
+        for row in (result.data or []):
+            fhir = row.get("fhir_json") or {}
+            for entry in fhir.get("entry", []):
+                resource = entry.get("resource", {})
+                rtype = resource.get("resourceType", "")
+                if rtype == "AllergyIntolerance":
+                    code = resource.get("code", {})
+                    display = code.get("text") or (code.get("coding", [{}])[0].get("display", ""))
+                    if display:
+                        context_parts.append(f"ALLERGY: {display}")
+                elif rtype == "Condition":
+                    code = resource.get("code", {})
+                    display = code.get("text") or (code.get("coding", [{}])[0].get("display", ""))
+                    if display:
+                        context_parts.append(f"CONDITION: {display}")
+        return "\n".join(context_parts) if context_parts else "No prior allergies or conditions on record."
+    except Exception as e:
+        logger.warning(f"Context fetch failed for {patient_id}: {e}")
+        return ""
+
+
+def _detect_conflicts(raw_text: str, context: str) -> tuple[bool, str]:
+    """Check if raw_text prescribes something that cross-reacts with known allergies in context."""
+    text_lower = raw_text.lower()
+    context_lower = context.lower()
+    warnings = []
+    for allergen, reactants in CROSS_REACTIVITY_MAP.items():
+        if allergen in context_lower:
+            for reactant in reactants:
+                if reactant in text_lower:
+                    warnings.append(
+                        f"CONFLICT: Patient has known {allergen} allergy; "
+                        f"{reactant} (prescribed in this note) may cause cross-reactivity."
+                    )
+    if warnings:
+        return True, " | ".join(warnings)
+    return False, ""
+
+
+def call_groq(raw_text: str, patient_id: str) -> tuple[dict, bool, str]:
+    """Returns (fhir_bundle, conflict_flag, ai_warning_msg)."""
     fallback = {
         "resourceType": "Bundle",
         "entry": [{"resource": {"resourceType": "Patient", "id": patient_id,
                                 "note": [{"text": raw_text[:200] if raw_text else "No clinical text provided"}]}}],
     }
+    context = _get_patient_context(patient_id)
+    conflict_flag, ai_warning_msg = _detect_conflicts(raw_text, context)
+
     if not groq or not raw_text.strip():
-        return fallback
+        return fallback, conflict_flag, ai_warning_msg
     try:
+        prompt = (
+            FHIR_PROMPT_WITH_CONTEXT.format(text=raw_text, context=context)
+            if context and context != "No prior allergies or conditions on record."
+            else FHIR_PROMPT.format(text=raw_text)
+        )
         resp = groq.chat.completions.create(
             model=LLM_CLOUD_MODEL,
-            messages=[{"role": "user", "content": FHIR_PROMPT.format(text=raw_text)}],
+            messages=[{"role": "user", "content": prompt}],
             timeout=30,
         )
         content = _extract_json(resp.choices[0].message.content or "")
         if not content:
             raise ValueError("Empty response after stripping thinking tags")
-        return json.loads(content)
+        return json.loads(content), conflict_flag, ai_warning_msg
     except Exception as e:
         logger.warning(f"Groq/parse error for {patient_id}: {e}")
-        return fallback
+        return fallback, conflict_flag, ai_warning_msg
 
 
 def _make_redis_client():
@@ -103,15 +181,21 @@ async def _drain_redis(redis_client) -> int:
             for msg_id, fields in records:
                 patient_id = fields.get("patient_id", "unknown")
                 try:
-                    fhir = call_groq(fields.get("raw_text", ""), patient_id)
+                    fhir, conflict_flag, ai_warning_msg = call_groq(fields.get("raw_text", ""), patient_id)
                     if supabase:
-                        supabase.table("staging_vault").insert({
+                        row = {
                             "patient_id": patient_id,
                             "raw_payload": fields,
                             "fhir_json": fhir,
                             "status": "processed",
                             "model": LLM_CLOUD_MODEL,
-                        }).execute()
+                            "processed_at": datetime.now(timezone.utc).isoformat(),
+                        }
+                        if conflict_flag:
+                            row["conflict_flag"] = True
+                            row["ai_warning_msg"] = ai_warning_msg
+                            logger.warning(f"⚠️ [WORKER] Conflict detected for {patient_id}: {ai_warning_msg}")
+                        supabase.table("staging_vault").insert(row).execute()
                     await redis_client.xdel("vault:ingest", msg_id)
                     logger.info(f"✅ [WORKER] Redis processed: patient={patient_id}")
                     processed += 1
@@ -146,13 +230,19 @@ async def _poll_staging_vault() -> int:
             raw_text = raw_payload.get("raw_text", "") if isinstance(raw_payload, dict) else ""
             attempts = row.get("attempts") or 0
             try:
-                fhir = call_groq(raw_text, patient_id)
-                supabase.table("staging_vault").update({
+                fhir, conflict_flag, ai_warning_msg = call_groq(raw_text, patient_id)
+                update_data = {
                     "fhir_json": fhir,
                     "status": "processed",
                     "model": LLM_CLOUD_MODEL,
                     "attempts": attempts + 1,
-                }).eq("id", rid).execute()
+                    "processed_at": datetime.now(timezone.utc).isoformat(),
+                }
+                if conflict_flag:
+                    update_data["conflict_flag"] = True
+                    update_data["ai_warning_msg"] = ai_warning_msg
+                    logger.warning(f"⚠️ [WORKER] Conflict detected for {patient_id}: {ai_warning_msg}")
+                supabase.table("staging_vault").update(update_data).eq("id", rid).execute()
                 logger.info(f"✅ [WORKER] Vault processed: patient={patient_id}")
                 processed += 1
             except Exception as e:
