@@ -1,5 +1,6 @@
 """AI worker loop — runs as a background asyncio task inside the FastAPI process."""
 import os
+import re
 import json
 import asyncio
 import logging
@@ -14,7 +15,7 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_SECRET_KEY") or os.environ.get("SUPABASE_KEY")
 LLM_CLOUD_KEY = os.environ.get("LLM_CLOUD_KEY")
-LLM_CLOUD_MODEL = os.environ.get("LLM_CLOUD_MODEL", "qwen/qwen3-32b")
+LLM_CLOUD_MODEL = os.environ.get("LLM_CLOUD_MODEL", "llama-3.3-70b-versatile")
 POLL_INTERVAL = 15
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if (SUPABASE_URL and SUPABASE_KEY) else None
@@ -37,7 +38,7 @@ def _extract_json(raw: str) -> str:
     if "<think>" in content and "</think>" in content:
         content = content.split("</think>", 1)[1].strip()
     elif content.startswith("<think>"):
-        return ""  # only reasoning returned, no answer
+        content = ""
     # Strip markdown code fences
     if content.startswith("```"):
         lines = content.splitlines()
@@ -48,6 +49,11 @@ def _extract_json(raw: str) -> str:
         while end > start and lines[end - 1].strip() == "```":
             end -= 1
         content = "\n".join(lines[start:end]).strip()
+    # Last resort: find any JSON object anywhere in the full raw response
+    if not content:
+        m = re.search(r"\{[\s\S]*\}", raw)
+        if m:
+            content = m.group(0)
     return content
 
 
